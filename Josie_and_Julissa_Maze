@@ -201,16 +201,185 @@ var splash = function()
     drawBitmojiJulissa(213,106,14);
 };//Splash goes on currentScene = 0 
 
+//splash 2
+/*var splash = function()//creates the splash scene
+{
+    background(246,231,222,255);
+    textSize(34);
+    fill(255, 10, 96);
+    strokeWeight(10);
+    textFont(createFont("Berlin Sans FB"), 30);
+    textAlign(CENTER, TOP);
+    text("Space Frogger",185, 100);
+    textSize(15);
+    text("creator: Julissa E. Tenas",86, 374);
+    strokeWeight(2);
+    startButton.draw();
+   };*/
 
-draw = function() {
-    if(currentScene===0) //draws splash scene
+//Global Variables
+var currentScene = 0;//Current scene at O is the Splash scene.
+var NUM_BLOCKS = 4;//Total number of ships.
+var score = 0;//Initial score of 0.
+var direction = 0; // 0 = blocks move from top ot bottom, 1 = blocks move from left to right
+var stillPlaying = true;//stillPlaying is global variable that is called  and implented in the code if the user is still playing 
+
+//put these back in to restart game
+
+var playButton = new Button(//a button instance called play button, when clicked, the Game Scene appears on screen.
+    { 
+        x: 211,
+        y: 344,
+        color: color(255, 10, 96),
+        label: "Play!",
+        textPos: 55,
+        onClick: function()
+        {
+        currentScene = 2;
+        }
+    });
+    
+var playAgainButton = new Button(///a button instance called play again button, when clicked, splash Scene appears on screen.
+    { 
+        x: 211,
+        y: 350,
+        color: color(255, 10, 96),
+        textPos: 35,
+        label: "Play Again!",
+        onClick: function()
+        {
+            currentScene = 0;
+            loop();
+            
+        }
+    });
+    
+var instructionsScene = function() {//creates the instruction scene
+    background(246,231,222,255);
+    textSize(5);
+    strokeWeight(10);
+    textFont(createFont("Berlin Sans FB"), 30);
+    fill(62, 59, 227);
+    text("blank", 10, 10,392,580); 
+    text("",94,10);
+    strokeWeight(2);
+    playButton.draw();
+};
+
+mouseClicked = function(){//This is a mouseClicked function allowing my buttons to be clickable and have its own function.
+  if (currentScene === 0)
+  {
+      startButton.handleMouseClick();
+        
+  }
+  else if (currentScene === 1)
+  {
+      playButton.handleMouseClick();
+      
+  }
+  else if (currentScene === 2)
+  {
+      playAgainButton.handleMouseClick();
+      
+  }
+};
+    
+var Bitmoji = function(x, y, character)//Object called bitmoji; creates my bitmoji
     {
-        splash();
+        this.x = x;
+        this.y = y;
+        this.bitmojiImg = character;
+        this.hitByBlock = 0;
+    };
+
+Bitmoji.prototype.draw = function() {//draw method:draws itself// scoring occurs is this.y > 350 && this.y <50 ex: var direction=0 for y is 350 and direction =1 this.y is 50 (get from bottom to top = 10 points)
+    this.x = mouseX;
+    this.y = mouseY;
+    this.bitmojiImg(this.x, this.y,  12);//this might not work?
+};
+
+var blocks = [];
+Bitmoji.prototype.hitByBlocks = function(b) {
+    if ((b.x >= this.x && b.x <= (this.x + 40)) &&
+        (b.y >= this.y && b.y <= (this.y + 40)))
+        {
+        b.y = -400;
+        this.hitByBlocks++;
+        score -=  10;
+        }
+};
+
+var Block = function(x, y, blockHeight, blockWidth) {
+    this.x = x;
+    this.y = y;
+    this.height = blockHeight;
+    this.width = blockWidth;
+};
+Block.prototype.draw = function() {
+    fill(255, 0, 0);
+    rect(this.x, this.y, this.height, this.width);
+};
+
+var julissa = new Bitmoji(200, 317, drawBitmojiJulissa);//bitmpji displayed on the screen
+
+for (var i = 0; i < NUM_BLOCKS; i++) { 
+    blocks.push(new Block(11 + -i *  110 , random(20, 260)));}//placement blocks
+
+var Game = function() {//User Interaction of Program
+    currentScene = 2;
+    background(0, 0, 0);
+    fill(255, 255, 255);
+    rectMode(CORNER);
+    rect(0, height*0.90, width, height*0.10);
+    rect(0, height*0.00, width, height*0.10);
+    
+    for (var i = 0; i < blocks.length; i++) { //For loop that draws ships, when the loop reaches an index of 49 the ships will double there speeds across the screens.
+    blocks[i].draw();
+    julissa.hitByBlock(blocks[i]);
+    blocks[i].x += 1;
+    /*if (blocks[NUM_BLOCKS/3].x > 48)
+    {
+        fill(255, 10, 96);
+        textSize(20);
+        text("P h a s e : 1", 10, 375);
+    } 
+    if (blocks[NUM_BLOCKS/2].x > 0)
+    {
+        fill(255, 10, 96);
+        textSize(20);
+        blocks[i].x += 2;
+        text("P h a s e : 2", 10, 375);
+    }*/
+}
+    fill(255, 0, 0);
+    textSize(18);
+    text("Score: " + score , 8, 24);
+    julissa.draw();
+
+};
+
+draw = function() {/*A draw funciton that is testing if the current scene is 0 then it will display the splash scene. If it is 1, it will display instructionsScene, and if it's 2, it will show the Game scene. */
+    if (currentScene === 0 && stillPlaying === true)
+        {
+            splash();
+        }
+    else if (currentScene === 1 && stillPlaying === true)
+    {
+        instructionsScene();
     }
-    else//play game
+    else if (currentScene === 2 && stillPlaying === true)
     {
-       background(143, 143, 143);
-       
+        Game();
         
     }
-};//draws the scenes depending on the currentScene
+     if (blocks[NUM_BLOCKS-1].x > 400)//Once all ships have passed across the yoo x -axis mark, the game is over. The user can then click "play again" to restart the game.
+    {   
+        noLoop();
+        currentScene = 2;
+        fill(255, 255, 255);
+        textSize(60);
+        textFont(createFont("Berlin Sans FB"),60);
+        text("Game Over", 67,279);
+        playAgainButton.draw();
+    }      
+};
