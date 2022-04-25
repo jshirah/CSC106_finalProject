@@ -289,7 +289,7 @@ var Bitmoji = function(x, y, character)//Object called bitmoji; creates my bitmo
         this.x = x;
         this.y = y;
         this.bitmojiImg = character;
-        this.hitByBlock = 0;
+        this.blocksHit = 0;
     };
 
 Bitmoji.prototype.draw = function() {//draw method:draws itself// scoring occurs is this.y > 350 && this.y <50 ex: var direction=0 for y is 350 and direction =1 this.y is 50 (get from bottom to top = 10 points)
@@ -299,12 +299,12 @@ Bitmoji.prototype.draw = function() {//draw method:draws itself// scoring occurs
 };
 
 var blocks = [];
-Bitmoji.prototype.hitByBlocks = function(b) {
+Bitmoji.prototype.hitByBlock = function(b) {
     if ((b.x >= this.x && b.x <= (this.x + 40)) &&
         (b.y >= this.y && b.y <= (this.y + 40)))
         {
         b.y = -400;
-        this.hitByBlocks++;
+        this.blocksHit++;
         score -=  10;
         }
 };
@@ -323,7 +323,9 @@ Block.prototype.draw = function() {
 var julissa = new Bitmoji(200, 317, drawBitmojiJulissa);//bitmpji displayed on the screen
 
 for (var i = 0; i < NUM_BLOCKS; i++) { 
-    blocks.push(new Block(11 + -i *  110 , random(20, 260)));}//placement blocks
+    blocks.push(new Block(11 + -i * 110 , random(20, 260), 10, 10));}
+
+    //placement blocks
 
 var Game = function() {//User Interaction of Program
     currentScene = 2;
@@ -334,23 +336,23 @@ var Game = function() {//User Interaction of Program
     rect(0, height*0.00, width, height*0.10);
     
     for (var i = 0; i < blocks.length; i++) { //For loop that draws ships, when the loop reaches an index of 49 the ships will double there speeds across the screens.
-    blocks[i].draw();
-    julissa.hitByBlock(blocks[i]);
-    blocks[i].x += 1;
-    /*if (blocks[NUM_BLOCKS/3].x > 48)
-    {
-        fill(255, 10, 96);
-        textSize(20);
-        text("P h a s e : 1", 10, 375);
-    } 
-    if (blocks[NUM_BLOCKS/2].x > 0)
-    {
-        fill(255, 10, 96);
-        textSize(20);
-        blocks[i].x += 2;
-        text("P h a s e : 2", 10, 375);
-    }*/
-}
+        blocks[i].draw();
+        julissa.hitByBlock(blocks[i]);
+        blocks[i].x += 1;
+    //   if (blocks[NUM_BLOCKS/3].x > 48)
+    //     {
+    //         fill(255, 10, 96);
+    //         textSize(20);
+    //         text("P h a s e : 1", 10, 375);
+    //     } 
+    //     if (blocks[NUM_BLOCKS/2].x > 0)
+    //     {
+    //         fill(255, 10, 96);
+    //         textSize(20);
+    //         blocks[i].x += 2;
+    //         text("P h a s e : 2", 10, 375);
+    //     }
+    }
     fill(255, 0, 0);
     textSize(18);
     text("Score: " + score , 8, 24);
@@ -383,3 +385,16 @@ draw = function() {/*A draw funciton that is testing if the current scene is 0 t
         playAgainButton.draw();
     }      
 };
+
+/*draw = function() {
+    if(currentScene===0) //draws splash scene
+    {
+        splash();
+    }
+    else//play game
+    {
+       background(143, 143, 143);
+       
+        
+    }
+};*/
