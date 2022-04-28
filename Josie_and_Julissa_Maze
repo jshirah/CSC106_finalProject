@@ -1,11 +1,13 @@
 //Global Variables
 var currentScene = 0;//Current scene at O is the Splash scene.
-var NUM_BLOCKS = 40;//Total number of ships.
+var NUM_BLOCKS = 100;//Total number of ships.
 var BLOCK_SIZE = 20; //heighth and width of the blocks
 var score = 0;//Initial score of 0.
 var direction = 0; // 0 = blocks move from top ot bottom, 1 = blocks move from left to right
 var stillPlaying = true;//stillPlaying is global variable that is called  and implented in the code if the user is still playing
 var currentScene=0; //0 = splash; 1 = game play
+var xblocks = [];
+var yblocks = [];
 
 //bitmoji functions
 var drawBitmojiBodyJosie=function(x,y,h){
@@ -284,10 +286,20 @@ Bitmoji.prototype.hitByBlock = function(b) {
     if ((b.x >= this.x && b.x <= (this.x + 40)) &&
         (b.y >= this.y && b.y <= (this.y + 40)))
         {
-        b.y = -400;
-        this.blocksHit++;
-        score -=  10;
-        }
+            if (xblocks[1].x > 400)
+         {  
+            noLoop();
+            currentScene = 2;
+            fill(255, 255, 255);
+            textSize(60);
+            textFont(createFont("Berlin Sans FB"),60);
+            text("Game Over", 67,279);
+            playAgainButton.draw();
+         }
+            this.blocksHit++;
+            score -=  10;
+            
+        }    
 };
 
 var Block = function(x, y, blockHeight, blockWidth) { //change structure to be object oriented - config, pass in object. 
@@ -305,8 +317,6 @@ var julissa = new Bitmoji(200, 317, 15, drawBitmojiJulissa);//bitmoji displayed 
 var josie = new Bitmoji(200, 200, 50, drawBitmojiJosie);
 
 
-var xblocks = [];
-var yblocks = [];
 for (var i = 0; i < NUM_BLOCKS; i++)
 {
     xblocks.push(new Block(11 + -i * 110 , random(20, 260), BLOCK_SIZE, BLOCK_SIZE));
@@ -350,16 +360,10 @@ draw = function() {/*A draw funciton that is testing if the current scene is 0 t
     else if (currentScene === 2 && stillPlaying === true)
     {
         game();
-        
     }
-     if (xblocks[NUM_BLOCKS-1].x > 400)
-     {   
-        noLoop();
-        currentScene = 2;
-        fill(255, 255, 255);
-        textSize(60);
-        textFont(createFont("Berlin Sans FB"),60);
-        text("Game Over", 67,279);
-        playAgainButton.draw();
-    }   /*Once all ships have passed across the yoo x -axis mark, the game is over. The user can then click "play again" to restart the game*/   
+    else if (currentScene === 0 && stillPlaying === true)
+    {
+        game();
+    }
+    /*Once all ships have passed across the yoo x -axis mark, the game is over. The user can then click "play again" to restart the game*/   
 };
