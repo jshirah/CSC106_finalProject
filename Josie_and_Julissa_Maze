@@ -1,15 +1,14 @@
 //Global Variables
 var currentScene = 0;//Current scene at O is the Splash scene.
-var NUM_BLOCKS = 100;//Total number of ships.
+var NUM_BLOCKS = 40;//Total number of ships
 var BLOCK_SIZE = 20; //heighth and width of the blocks
+var NUM_GEMS = 10;
 var score = 0;//Initial score of 0.
 var direction = 0; // 0 = blocks move from top ot bottom, 1 = blocks move from left to right
 var stillPlaying = true;//stillPlaying is global variable that is called  and implented in the code if the user is still playing
 var currentScene=0; //0 = splash; 1 = game play
-var xblocks = [];
-var yblocks = [];
 
-//bitmoji functions
+//bitmoji code and object
 var drawBitmojiBodyJosie=function(x,y,h){
    noStroke();
     fill(25, 82, 120);//shirt color
@@ -145,127 +144,6 @@ line(bitmojiX + (bitmojiHeight / 50) * 157, bitmojiY + (bitmojiHeight / 50) * 21
     stroke(0, 0, 0);
 };
 
-//Button Object 
-var Button = function(config) {
-    this.x = config.x || 0;
-    this.y = config.y || 0;
-    this.width = config.width || 150;
-    this.height = config.height || 50;
-    this.label = config.label || "Click";
-    this.onClick = config.onClick || function() {};
-    //this.bitmojis = config.bitmojis || function(){};
-};
-
-Button.prototype.draw = function() {
-    fill(0, 234, 255);
-    rect(this.x, this.y, this.width, this.height, 5);
-    fill(0, 0, 0);
-    textSize(19);
-    textAlign(LEFT, TOP);
-    text(this.label, this.x+10, this.y+this.height/4);
-    //this.bitmojis
-}; //draw method for class Button
-Button.prototype.isMouseInside = function() {
-    return mouseX > this.x &&
-           mouseX < (this.x + this.width) &&
-           mouseY > this.y &&
-           mouseY < (this.y + this.height);
-};//checks if mouse is inside the button
-Button.prototype.handleMouseClick = function() {
-    if (this.isMouseInside()) {
-        this.onClick();
-    }
-};//checks if mouse is inside then runs onclick function
-
-
-var startButton = new Button({
-    x: 169,
-    y: 267,
-    width:108,
-    label: "Play game",
-    //bitmojis: drawBitmojiJosie(203,153,50),
-    onClick: function() {
-        currentScene=1;
-    }
-}); //start button
-
-mouseClicked = function() {
-    if(currentScene===0)
-    {
-        startButton.handleMouseClick();
-    }
-};//runs handleMouseClick for the various scenes 
-
-var splash = function(){
-    background(144, 232, 219);
-    fill(0, 0, 0);
-    textSize(24);
-    text("Josie and Julissa's Maze",80,210);
-    startButton.draw();
-    drawBitmojiJosie(154,153,60);
-    drawBitmojiJulissa(213,106,14);
-};//Splash goes on currentScene = 0 
-
-
-//put these back in to restart game
-var playButton = new Button(//a button instance called play button, when clicked, the Game Scene appears on screen.
-    { 
-        x: 211,
-        y: 344,
-        color: color(255, 10, 96),
-        label: "Play!",
-        textPos: 55,
-        onClick: function()
-        {
-        currentScene = 2;
-        }
-    });
-    
-var playAgainButton = new Button(///a button instance called play again button, when clicked, splash Scene appears on screen.
-    { 
-        x: 211,
-        y: 350,
-        color: color(255, 10, 96),
-        textPos: 35,
-        label: "Play Again!",
-        onClick: function()
-        {
-            currentScene = 0;
-            loop();
-            
-        }
-    });
-    
-var instructionsScene = function() {//creates the instruction scene
-    background(246,231,222,255);
-    textSize(5);
-    strokeWeight(10);
-    textFont(createFont("Berlin Sans FB"), 30);
-    fill(62, 59, 227);
-    text("blank", 10, 10,392,580); 
-    text("",94,10);
-    strokeWeight(2);
-    playButton.draw();
-};
-
-mouseClicked = function(){//This is a mouseClicked function allowing my buttons to be clickable and have its own function.
-  if (currentScene === 0)
-  {
-      startButton.handleMouseClick();
-        
-  }
-  else if (currentScene === 1)
-  {
-      playButton.handleMouseClick();
-      
-  }
-  else if (currentScene === 2)
-  {
-      playAgainButton.handleMouseClick();
-      
-  }
-};
-    
 var Bitmoji = function(x, y, height, character)//Object called bitmoji; creates my bitmoji
     {
         this.x = x;
@@ -273,34 +151,35 @@ var Bitmoji = function(x, y, height, character)//Object called bitmoji; creates 
         this.height = height;
         this.bitmojiImg = character;
         this.blocksHit = 0;
+        this.gemsCollected = 0;
     };
-
 Bitmoji.prototype.draw = function() {//draw method:draws itself// scoring occurs is this.y > 350 && this.y <50 ex: var direction=0 for y is 350 and direction =1 this.y is 50 (get from bottom to top = 10 points)
     this.x = mouseX;
     this.y = mouseY;
     this.bitmojiImg(this.x, this.y, this.height);
 };
-
-
 Bitmoji.prototype.hitByBlock = function(b) {
     if ((b.x >= this.x && b.x <= (this.x + 40)) &&
         (b.y >= this.y && b.y <= (this.y + 40)))
         {
-            if (xblocks[1].x > 400)
-         {  
-            noLoop();
-            currentScene = 2;
-            fill(255, 255, 255);
-            textSize(60);
-            textFont(createFont("Berlin Sans FB"),60);
-            text("Game Over", 67,279);
-            playAgainButton.draw();
-         }
-            this.blocksHit++;
-            score -=  10;
-            
-        }    
+        b.y = -400;
+        this.blocksHit++;
+        score -=  10;
+        }
 };
+Bitmoji.prototype.collectGem = function(b) {
+    if ((b.x >= (this.x-50) && b.x <= (this.x + 50)) &&
+        (b.y >= (this.y-50) && b.y <= (this.y + 50)))
+        {
+        b.y = -400;
+        this.gemsCollected++;
+        score +=  20;
+        }
+};
+
+//code for blocks
+var xblocks = [];
+var yblocks =[];
 
 var Block = function(x, y, blockHeight, blockWidth) { //change structure to be object oriented - config, pass in object. 
     this.x = x;
@@ -312,6 +191,22 @@ Block.prototype.draw = function() {
     fill(255, 0, 0);
     rect(this.x, this.y, this.height, this.width);
 };
+
+//code for gems
+var Gem = function(x,y){
+    this.x=x;
+    this.y=y;
+    this.img=getImage("cute/GemGreen");
+};
+var gems = [];
+for(var k = 0; k<NUM_GEMS; k++)
+{
+    gems.push(new Gem(random(10,350),random(10,350)));
+}
+Gem.prototype.draw= function() {
+    image(this.img, this.x, this.y, 40, 60);
+};
+
 
 var julissa = new Bitmoji(200, 317, 15, drawBitmojiJulissa);//bitmoji displayed on the screen
 var josie = new Bitmoji(200, 200, 50, drawBitmojiJosie);
@@ -329,9 +224,7 @@ var game = function() {//User Interaction of Program
     currentScene = 2;
     background(0, 0, 0);
     fill(255, 255, 255);
-    rectMode(CORNER);
-    rect(0, height*0.90, width, height*0.10);
-    rect(0, height*0.00, width, height*0.10);
+    
     
     for (var i = 0; i < xblocks.length; i++) { //For loop that draws ships, when the loop reaches an index of 49 the ships will double there speeds across the screens.
         xblocks[i].draw();
@@ -342,28 +235,20 @@ var game = function() {//User Interaction of Program
         yblocks[i].y += random(1,5);
    
     }
-    fill(255, 0, 0);
+    gems[josie.gemsCollected].draw();
+    josie.collectGem(gems[josie.gemsCollected]);
+    //gems cause program to stop working when the user reaches end of array fix bug!
+    
+    
+    fill(0, 255, 55);
     textSize(18);
     text("Score: " + score , 8, 24);
     josie.draw(); //What is changed to change characters in game play!
 
 };
+
 draw = function() {/*A draw funciton that is testing if the current scene is 0 then it will display the splash scene. If it is 1, it will display instructionsScene, and if it's 2, it will show the Game scene. */
-    if (currentScene === 0 && stillPlaying === true)
-        {
-            splash();
-        }
-    else if (currentScene === 1 && stillPlaying === true)
-    {
-        instructionsScene();
-    }
-    else if (currentScene === 2 && stillPlaying === true)
-    {
-        game();
-    }
-    else if (currentScene === 0 && stillPlaying === true)
-    {
-        game();
-    }
-    /*Once all ships have passed across the yoo x -axis mark, the game is over. The user can then click "play again" to restart the game*/   
+    
+    game();
+     
 };
