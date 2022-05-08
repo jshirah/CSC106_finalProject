@@ -1,0 +1,254 @@
+//Global Variables
+var currentScene = 0;//Current scene at O is the Splash scene.
+var NUM_BLOCKS = 40;//Total number of ships
+var BLOCK_SIZE = 20; //heighth and width of the blocks
+var NUM_GEMS = 10;
+var score = 0;//Initial score of 0.
+var direction = 0; // 0 = blocks move from top ot bottom, 1 = blocks move from left to right
+var stillPlaying = true;//stillPlaying is global variable that is called  and implented in the code if the user is still playing
+var currentScene=0; //0 = splash; 1 = game play
+
+//bitmoji code and object
+var drawBitmojiBodyJosie=function(x,y,h){
+   noStroke();
+    fill(25, 82, 120);//shirt color
+    quad(x-(h/100*39),y+(h/100*55),x+(h/100*40),y+(h/100*55),x+(h/100*37),y+(h/100*18),x-(h/100*35),y+(h/100*18));//shirt
+    fill(255, 226, 198);//Skin tone
+    ellipse(x,y+(h/100*8),(h/100*29),(h/100*38));//neck shirt line
+    fill(255, 255, 255); //text color
+    textSize((h/100)*16);
+    text("JS",x-(h/90*7),y+(h/122*45));//shirt initials
+    noStroke();
+    fill(176, 176, 176);//hat color
+    arc(x,y-(h/100*35),(h/100*62),(h/100*55),0,360);//hat base shape
+    fill(195,144,57);//hair color
+    ellipse(x,y-(h/100*19),(h/100*60),(h/100*72));//part 1 hair
+    fill(195,144,57);//hair color
+    rect(x+(h/100*9),y-(h/100*13),(h/100*20),(h/100*50));//right bottom hair
+    rect(x-(h/100*30),y-(h/100*13),(h/100*20),(h/100*50));//left bottom hair
+};
+var drawBitmojiHeadJosie=function(x,y,h){
+    fill(255, 226, 198);//Skin tone
+    noStroke();// no outline
+    rect(x-(h/100*10),y-(h/100*4),(h/100*19),(h/100*22));//neck
+    stroke(186, 151, 151);//face outline
+    ellipse(x,y-(h/100*19),(h/100*48),(h/100*59));//face
+    
+    noStroke();
+    fill(195,144,57);//hair color
+    rect(x+(h/100*21),y-(h/100*32),(h/100*5),(h/100*39));//right hair over face
+    rect(x-(h/100*26),y-(h/100*32),(h/100*5),(h/100*39));//left hair over face
+    fill(176, 176, 176);//hat color
+    arc(x-(h/100*20),y-(h/100*42),(h/100*18),(h/100*21),138,309);//hat help shape
+    arc(x+(h/100*17),y-(h/100*46),(h/100*22),(h/100*13),244,410);//hat help shape
+    
+    noStroke();
+    fill(255, 255, 255);//eye white
+    ellipse(x+(h/100*9),y-(h/100*27),(h/100*12),(h/100*8));//right eye white
+    ellipse(x-(h/100*7),y-(h/100*27),(h/100*12),(h/100*8));//right eye white
+    fill (112, 94, 7);//eye color
+    ellipse(x+(h/100*9),y-(h/100*27),(h/100*5),(h/100*5));//right eye
+    ellipse(x-(h/100*7),y-(h/100*27),(h/100*5),(h/100*5));//left eye
+    fill(255, 226, 198);//Skin tone
+    strokeWeight(1);
+    stroke(0, 0, 0);//nose outline
+    bezier(x-(h/100*2),y-(h/100*13),x+(h/100*9),y-(h/100*13),x+(h/100*1),y-(h/100*18),x+(h/100*1),y-(h/100*24));//nose
+    stroke(219, 105, 105); //mouth outline color
+    line(x+(h/100*12),y-(h/100*6.5),x-(h/100*12),y-(h/100*6.5));//top lip
+    fill(255,255,255);//teeth color
+    arc(x,y-(h/100*6),(h/100*23),(h/100*15),0,180);//mouth
+};
+var drawBitmojiJosie=function(x,y,h){
+    drawBitmojiBodyJosie(x,y,h);
+    drawBitmojiHeadJosie(x,y,h);
+    stroke(0,0,0);
+};
+var drawBitmojiJulissa = function(bitmojiX,bitmojiY,bitmojiHeight){
+    stroke(0, 0, 0);
+    strokeWeight(1);
+    fill(23, 15, 15);//black
+    rect(bitmojiX + (bitmojiHeight / 50) * 130, bitmojiY + (bitmojiHeight / 50) * 60, (bitmojiHeight / 50) * 99, (bitmojiHeight / 50) * 172);//hair
+    
+    fill(237, 195, 118);//skin color
+    arc(bitmojiX + (bitmojiHeight / 50) * 180, bitmojiY + (bitmojiHeight / 50) * 139, (bitmojiHeight / 50) * 86, (bitmojiHeight / 50) * 110, 68, 111); //neck
+    ellipse(bitmojiX + (bitmojiHeight / 50) * 180, bitmojiY + (bitmojiHeight / 50) * 109, (bitmojiHeight / 50) * 89, (bitmojiHeight / 50) * 128); //face
+    fill(23, 15, 15);//skin color
+    arc(bitmojiX + (bitmojiHeight / 50) * 180, bitmojiY + (bitmojiHeight / 50) * 61, (bitmojiHeight / 50) * 99,(bitmojiHeight / 50) * -44, -31, 211); //scalp
+    arc(bitmojiX + (bitmojiHeight / 50) * 136, bitmojiY + (bitmojiHeight / 50) * 119, (bitmojiHeight / 50)* 23, (bitmojiHeight / 50) * 136, 131, 307); //left side inner hair
+    arc(bitmojiX + (bitmojiHeight / 50) * 222, bitmojiY + (bitmojiHeight/50) * 120, (bitmojiHeight/50) * 28, (bitmojiHeight / 50) * 136, -131, 45); //right side inner hair
+    arc(bitmojiX + (bitmojiHeight / 50) * 132, bitmojiY + (bitmojiHeight / 50) * 124, (bitmojiHeight / 50 ) * 23, (bitmojiHeight / 50) * 136, 131, 307); //left middle inner hair
+    arc(bitmojiX + (bitmojiHeight / 50) * 227, bitmojiY + (bitmojiHeight / 50) * 121, (bitmojiHeight / 50) * 20, (bitmojiHeight / 50) * 127, -103, 66); //right middle inner hair
+    arc(bitmojiX + (bitmojiHeight / 50) * 131, bitmojiY + (bitmojiHeight / 50) * 157, (bitmojiHeight / 50) * 23, (bitmojiHeight / 50) * 138, 41, 308); //left side outer hair
+    arc(bitmojiX + (bitmojiHeight / 50) * 224, bitmojiY + (bitmojiHeight / 50) * 161, (bitmojiHeight / 50) * 28, (bitmojiHeight / 50) * 135, -113, 145); //right side outer hair
+    arc(bitmojiX + (bitmojiHeight / 50) * 141, bitmojiY + (bitmojiHeight / 50) * 145, (bitmojiHeight / 50) * 29, (bitmojiHeight / 50) * 110, 18, 259); //right jaw 
+    arc(bitmojiX + (bitmojiHeight / 50) * 225, bitmojiY + (bitmojiHeight / 50) * 149, (bitmojiHeight / 50) * 27, (bitmojiHeight / 50) * 109, -78, 165); //left jaw 
+    
+    fill(237, 195, 118);//smile
+    arc(bitmojiX + (bitmojiHeight / 50) *181, bitmojiY + (bitmojiHeight/50) * 145, (bitmojiHeight / 50) * 29, (bitmojiHeight / 50) * 18, 376, 517);//mouth
+    
+    noStroke();
+    fill(232, 126, 147);//pink
+    arc(bitmojiX + (bitmojiHeight / 50) * 181, bitmojiY + (bitmojiHeight / 50) * 147, (bitmojiHeight / 50) * 25, (bitmojiHeight / 50) * 20, 384, 517); //lips
+    
+    fill(15, 15, 15);//black
+    arc(bitmojiX + (bitmojiHeight / 50) * 198, bitmojiY + (bitmojiHeight / 50) * 87, (bitmojiHeight / 50) * 24, (bitmojiHeight / 50) * 6, 171, 383); //right eyebrow
+    arc(bitmojiX + (bitmojiHeight / 50) * 158, bitmojiY + (bitmojiHeight / 50) * 87, (bitmojiHeight / 50) * 24, (bitmojiHeight / 50) * 6, 154, 369);//left eyebrow
+    
+    stroke(0, 0, 0);
+    strokeWeight(1);
+    fill(255, 255, 255);//white
+    arc(bitmojiX + (bitmojiHeight / 50) * 199, bitmojiY + (bitmojiHeight / 50) * 106, (bitmojiHeight / 50) * 29, (bitmojiHeight / 50) * 27, 171, 372);//right cornea
+    arc(bitmojiX + (bitmojiHeight / 50) * 160, bitmojiY + (bitmojiHeight / 50) * 106, (bitmojiHeight / 50) * 29, (bitmojiHeight / 50) * 27, 171, 372);//left cornea
+    
+    fill(130, 103, 5);//brown
+    ellipse(bitmojiX + (bitmojiHeight / 50) * 199, bitmojiY + (bitmojiHeight / 50) * 106, (bitmojiHeight / 50) * 10, (bitmojiHeight / 50) * 10);//right eye
+    ellipse(bitmojiX + (bitmojiHeight  /50) * 160, bitmojiY + (bitmojiHeight / 50) * 106, (bitmojiHeight / 50) * 10, (bitmojiHeight / 50) * 10);//left eye
+    
+    stroke(0, 0, 0);
+    strokeWeight(1);
+    fill(237, 195, 118);//skin color
+    ellipse(bitmojiX + (bitmojiHeight / 50) * 180, bitmojiY + (bitmojiHeight / 50) * 129, (bitmojiHeight / 50) * 10, (bitmojiHeight / 50) *10);//nose
+    ellipse(bitmojiX + (bitmojiHeight / 50) * 175, bitmojiY + (bitmojiHeight / 50) * 127, (bitmojiHeight / 50) * 10, (bitmojiHeight / 50) * 10);//nose
+    ellipse(bitmojiX + (bitmojiHeight / 50) * 185, bitmojiY + (bitmojiHeight / 50) * 127, (bitmojiHeight / 50) * 10, (bitmojiHeight / 50) * 10);//nose
+    
+    stroke(0, 0, 0);
+    strokeWeight(1);
+    fill(240, 40, 64);
+    arc(bitmojiX + (bitmojiHeight / 50) * 180,bitmojiY + (bitmojiHeight / 50) * 65, (bitmojiHeight / 50) * 119, (bitmojiHeight / 50) * 66, 161, 381);//hat
+    ellipse(bitmojiX + (bitmojiHeight / 50) * 180, bitmojiY + (bitmojiHeight / 50)*67, (bitmojiHeight / 50) * 93, (bitmojiHeight / 50) * 11); //hatlid
+    stroke(237, 195, 118);
+    strokeWeight(1);
+    fill(237, 195, 118);
+    ellipse(bitmojiX  + (bitmojiHeight / 50) * 180, bitmojiY + (bitmojiHeight / 50) * 128, (bitmojiHeight / 50) * 10, (bitmojiHeight / 50) * 10);//nose
+    ellipse(bitmojiX + (bitmojiHeight / 50) * 180, bitmojiY + (bitmojiHeight / 50) * 123, (bitmojiHeight / 50) * 10, (bitmojiHeight / 50) * 10);//nose
+    noStroke();
+    fill(237, 195, 118);//skin color
+    rect(bitmojiX + (bitmojiHeight / 50) * 138, bitmojiY + (bitmojiHeight / 50) * 224, (bitmojiHeight / 50) * 14, (bitmojiHeight / 50) * 60);//left arm
+    rect(bitmojiX + (bitmojiHeight / 50) * 212, bitmojiY + (bitmojiHeight / 50) * 227, (bitmojiHeight / 50) * 14, (bitmojiHeight / 50) * 60, (bitmojiHeight / 50) * 107);// right arm
+    arc(bitmojiX + (bitmojiHeight / 50) * 214, bitmojiY + (bitmojiHeight / 50) * 293, (bitmojiHeight / 50) * 29, (bitmojiHeight / 50) * 27, 286, 436);//right hand
+    arc(bitmojiX + (bitmojiHeight / 50) * 151, bitmojiY + (bitmojiHeight / 50) * 292, (bitmojiHeight / 50) * 29, (bitmojiHeight / 50) * 27, 464, 615);//left hand
+    stroke(18, 26, 69); 
+    strokeWeight(1);
+    fill(18, 26, 69);
+    rect(bitmojiX + (bitmojiHeight / 50) * 194, bitmojiY + (bitmojiHeight / 50) * 191, ( bitmojiHeight / 50) * 37, (bitmojiHeight / 50) * 46, (bitmojiHeight / 50) * 107);//shirt sleeve right
+    rect(bitmojiX + (bitmojiHeight / 50) * 136, bitmojiY + (bitmojiHeight / 50) * 191, (bitmojiHeight / 50) * 37, (bitmojiHeight / 50) * 46, (bitmojiHeight / 50)  * 107);//shirt sleeve left
+    rect(bitmojiX + (bitmojiHeight / 50) * 150, bitmojiY + (bitmojiHeight / 50) * 187, (bitmojiHeight / 50) * 64, (bitmojiHeight / 50) * 99, (bitmojiHeight / 50) * 14);//shirt base
+stroke(255, 255, 255);
+strokeWeight(2);
+fill(18, 26, 69);
+line(bitmojiX + (bitmojiHeight / 50) * 157, bitmojiY + (bitmojiHeight / 50) * 211, bitmojiX + (bitmojiHeight / 50) * 178,bitmojiY + (bitmojiHeight / 50) * 211);//horizontal j
+    line(bitmojiX + (bitmojiHeight / 50) * 169, bitmojiY + (bitmojiHeight / 50) * 234, bitmojiX + (bitmojiHeight / 50) * 168, bitmojiY + (bitmojiHeight / 50) * 212);//veritcal j
+    line(bitmojiX + (bitmojiHeight / 50) * 158, bitmojiY + (bitmojiHeight / 50) * 235, bitmojiX + (bitmojiHeight / 50) * 167, bitmojiY + (bitmojiHeight / 50) * 235);// j loop
+    line(bitmojiX + (bitmojiHeight / 50) * 196, bitmojiY + (bitmojiHeight / 50) * 234, bitmojiX + (bitmojiHeight / 50) * 195, bitmojiY + (bitmojiHeight / 50) * 214);// horizontal t
+    line(bitmojiX + (bitmojiHeight / 50) * 187, bitmojiY + (bitmojiHeight / 50) * 212, bitmojiX + (bitmojiHeight / 50) * 206, bitmojiY + (bitmojiHeight / 50) * 211);//horizontal t
+    stroke(0, 0, 0);
+};
+
+var Bitmoji = function(x, y, height, character)//Object called bitmoji; creates my bitmoji
+    {
+        this.x = x;
+        this.y = y;
+        this.height = height;
+        this.bitmojiImg = character;
+        this.blocksHit = 0;
+        this.gemsCollected = 0;
+    };
+Bitmoji.prototype.draw = function() {//draw method:draws itself// scoring occurs is this.y > 350 && this.y <50 ex: var direction=0 for y is 350 and direction =1 this.y is 50 (get from bottom to top = 10 points)
+    this.x = mouseX;
+    this.y = mouseY;
+    this.bitmojiImg(this.x, this.y, this.height);
+};
+Bitmoji.prototype.hitByBlock = function(b) {
+    if ((b.x >= this.x && b.x <= (this.x + 40)) &&
+        (b.y >= this.y && b.y <= (this.y + 40)))
+        {
+        b.y = -400;
+        this.blocksHit++;
+        score -=  10;
+        }
+};
+Bitmoji.prototype.collectGem = function(b) {
+    if ((b.x >= (this.x-50) && b.x <= (this.x + 50)) &&
+        (b.y >= (this.y-50) && b.y <= (this.y + 50)))
+        {
+        b.y = -400;
+        this.gemsCollected++;
+        score +=  20;
+        }
+};
+
+//code for blocks
+var xblocks = [];
+var yblocks =[];
+
+var Block = function(x, y, blockHeight, blockWidth) { //change structure to be object oriented - config, pass in object. 
+    this.x = x;
+    this.y = y;
+    this.height = blockHeight;
+    this.width = blockWidth;
+};
+Block.prototype.draw = function() {
+    fill(255, 0, 0);
+    rect(this.x, this.y, this.height, this.width);
+};
+
+//code for gems
+var Gem = function(x,y){
+    this.x=x;
+    this.y=y;
+    this.img=getImage("cute/GemGreen");
+};
+var gems = [];
+for(var k = 0; k<NUM_GEMS; k++)
+{
+    gems.push(new Gem(random(10,350),random(10,350)));
+}
+Gem.prototype.draw= function() {
+    image(this.img, this.x, this.y, 40, 60);
+};
+
+
+var julissa = new Bitmoji(200, 317, 15, drawBitmojiJulissa);//bitmoji displayed on the screen
+var josie = new Bitmoji(200, 200, 50, drawBitmojiJosie);
+
+
+for (var i = 0; i < NUM_BLOCKS; i++)
+{
+    xblocks.push(new Block(11 + -i * 110 , random(20, 260), BLOCK_SIZE, BLOCK_SIZE));
+    yblocks.push(new Block(random(20,380), 11 + -i*110, BLOCK_SIZE, BLOCK_SIZE));
+}
+
+    //placement blocks
+
+var game = function() {//User Interaction of Program
+    currentScene = 2;
+    background(0, 0, 0);
+    fill(255, 255, 255);
+    
+    
+    for (var i = 0; i < xblocks.length; i++) { //For loop that draws ships, when the loop reaches an index of 49 the ships will double there speeds across the screens.
+        xblocks[i].draw();
+        yblocks[i].draw();
+        josie.hitByBlock(xblocks[i]);//This must also be changed when character is changed
+        josie.hitByBlock(xblocks[i]);
+        xblocks[i].x += random(1,5);
+        yblocks[i].y += random(1,5);
+   
+    }
+    gems[josie.gemsCollected].draw();
+    josie.collectGem(gems[josie.gemsCollected]);
+    //gems cause program to stop working when the user reaches end of array fix bug!
+    
+    
+    fill(0, 255, 55);
+    textSize(18);
+    text("Score: " + score , 8, 24);
+    josie.draw(); //What is changed to change characters in game play!
+
+};
+
+draw = function() {/*A draw funciton that is testing if the current scene is 0 then it will display the splash scene. If it is 1, it will display instructionsScene, and if it's 2, it will show the Game scene. */
+    
+    game();
+     
+};
