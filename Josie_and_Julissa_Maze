@@ -150,9 +150,9 @@ line(bitmojiX + (bitmojiHeight / 50) * 157, bitmojiY + (bitmojiHeight / 50) * 21
     stroke(0, 0, 0);
 };
 
-/*Objects and their functions are defined below*/
+        /*Objects and their functions are defined below*/
 
-/*Button object class, creates buttons for user interaction*/
+    /*Button object class, creates buttons for user interaction*/
 //constructor function for class button
 var Button = function(config) {
     this.x = config.x || 0;
@@ -161,12 +161,13 @@ var Button = function(config) {
     this.height = config.height || 50;
     this.label = config.label || "Click";
     this.onClick = config.onClick || function() {};
+    this.buttonColor = config.buttonColor ||color(0, 255, 55);
     //this.bitmojis = config.bitmojis || function(){};
 }; 
 
 //draws rectangle for class Button below
 Button.prototype.draw = function() {
-    fill(0, 234, 255);
+    fill(this.buttonColor);
     rect(this.x, this.y, this.width, this.height, 5);
     fill(0, 0, 0);
     textSize(19);
@@ -191,7 +192,7 @@ Button.prototype.handleMouseClick = function() {
 }; 
 
 
-/*Bitmoji object class, creates user icon*/
+    /*Bitmoji object class, creates user icon*/
 /*constructor function for class Bitmoji below, parameters: x pos, y pos, height, and character (either josie or julissa*/
 var Bitmoji = function(x, y, height, character){
     this.x = x;
@@ -211,25 +212,14 @@ Bitmoji.prototype.draw = function(){
 
 /*function below for class Bitmoji checks if object is over block and subtracts points, parameter: b is either block array of specified index*/
 Bitmoji.prototype.hitByBlock = function(b) {
-    if (b.x >= (this.x-20) && b.x <= (this.x + 20) && b.y >= (this.y-20) && b.y <= (this.y + 40))
+    if (b.x >= (this.x-20) && b.x <= (this.x + 20) && b.y >= (this.y-20) && b.y <= (this.y + 40) && b.blockColor=== color(255,0,0))
     {
         this.blocksHit++; //REMOVE THIS??
         score -=  5;
         b.blockColor=color(0, 106, 255);
-            /*if (xblocks[1].x > 400)
-         {  
-            currentScene = 2;
-            fill(255, 255, 255);
-            textSize(60);
-            textFont(createFont("Berlin Sans FB"),60);
-            text("Game Over", 67,279);
-            playAgainButton.draw();
-         }//Move THIS CODE FOR PLAY AGAIN BUTON TO WORK*/ 
     }    
 };
 
-    /*HIT BY BLOCK PROTOTYPE HAS CODE TO BE REMOVED FOR PLAY AGAIN BUTTON TO WORK*/
-    
 /*function below for class Bitmoji checks if object is over gem and adds points, parameter: g is the gem array of a specified index*/ 
 Bitmoji.prototype.collectGem = function(g) {
     if ((g.x >= (this.x-50) && g.x <= (this.x + 50)) && (g.y >= (this.y-50) && g.y <= (this.y + 50)))
@@ -241,7 +231,7 @@ Bitmoji.prototype.collectGem = function(g) {
 };
 
 
-/*Block object class, user must avoid objects of this class*/
+    /*Block object class, user must avoid objects of this class*/
 //constructor function for class Block below, parameters: x pos, y pos, side length
 var Block = function(x, y, blockLength) { 
     this.x = x;
@@ -259,7 +249,7 @@ Block.prototype.draw = function() {
 };
 
 
-/*Gem object class, user must collect objects of class Gem*/
+    /*Gem object class, user must collect objects of class Gem*/
 //constructor function for class Gem below, parameters: x pos, y pos
 var Gem = function(x,y){
     this.x=x;
@@ -272,12 +262,36 @@ Gem.prototype.draw= function() {
     image(this.img, this.x, this.y, 40, 60);
 };
 
+    /*New instances of the objects are defined below*/
 
-/*New instances of the objects are defined below*/
+/*gameSetUp function resets key features and creates new instances of the objects block and gem - called in the playButton.onclick*/
+var gameSetUp = function(){
+    //sets arrays of moving objects to empty sets, used for play again
+    xblocks = [];
+    yblocks = [];
+    gems = [];
+    score = 0;
+    stillPlaying = true;
+    
+    //new instances of class Block, ojects to avoid in game, stored in an array
+    for (var i = 0; i < NUM_BLOCKS; i++){
+        xblocks.push(new Block(11 + -i * 110 , random(10, 390), BLOCK_SIZE));
+        yblocks.push(new Block(random(10,390), 11 + -i*110, BLOCK_SIZE));
+    }
+    //new instances of class Gem, objects to collect in game, stored in an array
+    for(var k = 0; k<NUM_GEMS; k++){
+        gems.push(new Gem(random(10,350),random(10,350)));
+        
+    }
+};
+
+//new instances of class Bitmoji, character used in game  
+var julissa = new Bitmoji(200, 317, 15, drawBitmojiJulissa);
+var josie = new Bitmoji(200, 200, 50, drawBitmojiJosie);
 
 //new instances of class Button
 var instructionButton = new Button({
-    x: 169,
+    x: 149,
     y: 267,
     width:108,
     label: "Instructions",
@@ -285,50 +299,31 @@ var instructionButton = new Button({
     onClick: function() {
         currentScene=1;
     }
-}); //on splash scene, sets currentScene=1
+}); //on splash scene, sets currentScene= 1
 var playButton = new Button({ 
         x: 211,
         y: 344,
-        color: color(255, 10, 96),
+        buttonColor: color(255, 10, 96),
         label: "Play!",
         textPos: 55,
-        onClick: function()
-        {
-        currentScene = 2;
+        onClick: function(){
+            currentScene = 2;
+            gameSetUp();
         }
-    }); //on instruction scene, sets currentScene =2
+    }); 
+    /*play button is on instruction scene, sets currentScene = 2, onclick calls gameSetUp to initialize arrays*/
 var playAgainButton = new Button({ 
-        x: 211,
-        y: 350,
-        color: color(255, 10, 96),
-        textPos: 35,
-        label: "Play Again!",
-        onClick: function()
-        {
-            currentScene = 0;
-            loop();
-            
-        }
-    });
-    
-    /*NOTE: REMOVE PLAY AGAIN BUTTON IF IT IS NOT USED*/
-  
-//new instances of class Bitmoji, character used in game  
-var julissa = new Bitmoji(200, 317, 15, drawBitmojiJulissa);
-var josie = new Bitmoji(200, 200, 50, drawBitmojiJosie);
+    x: 121,
+    y: 239,
+    textPos: 35,
+    label: "Play Again!",
+    onClick: function(){
+        currentScene = 0;
+        josie.gemsCollected = 0;
+    }
+}); //on gameEnd scene, sets currentScene =0
 
-//new instances of class Block, ojects to avoid in game, stored in an array
-for (var i = 0; i < NUM_BLOCKS; i++){
-    xblocks.push(new Block(11 + -i * 110 , random(10, 390), BLOCK_SIZE));
-    yblocks.push(new Block(random(10,390), 11 + -i*110, BLOCK_SIZE));
-}
 
-//new instances of class Gem, objects to collect in game, stored in an array
-for(var k = 0; k<NUM_GEMS; k++){
-    gems.push(new Gem(random(10,350),random(10,350)));
-}
-
-    
 /*Scene functions*/
 var splash = function(){
     background(144, 232, 219);
@@ -350,93 +345,83 @@ var instructionsScene = function() {
     playButton.draw();
 }; //instruction scene, current scene = 1
 var gameEnd = function(){
+    background(0, 0, 0);
     fill(0, 255, 55);
     textSize(40);
     text("Game Over", 100,150);
     textSize(30);
     text("Score: " + score , 140, 200);
-    stillPlaying = false;
+    playAgainButton.draw();
+    
 }; //game end scene, called when gems are collected
 var game = function() {
-     currentScene = 2;
-     background(0, 0, 0);
-     fill(255, 255, 255);
-    
+    currentScene = 2;
+    background(0, 0, 0);
+    fill(255, 255, 255);
     var totalCollectedGems = josie.gemsCollected;
-    if(gems.length-1>=josie.gemsCollected)
-    {
+    
+    if(gems.length-1>=josie.gemsCollected){
         gems[josie.gemsCollected].draw();
         josie.collectGem(gems[josie.gemsCollected]);
     }
     else{
-        gameEnd();
+        currentScene = 3;
+        stillPlaying = false;
     }
-    if(stillPlaying)
-    {
-        for (var i = 0; i < NUM_BLOCKS; i++) { //For loop that draws ships, when the loop reaches an index of 49 the ships will double there speeds across the screens.
+    for (var i = 0; i < NUM_BLOCKS; i++) {
         xblocks[i].draw();
         yblocks[i].draw();
-        josie.hitByBlock(xblocks[i]);//This must also be changed when character is changed
+        josie.hitByBlock(xblocks[i]);
         josie.hitByBlock(yblocks[i]);
         xblocks[i].x += xblocks[i].speed;
         yblocks[i].y += yblocks[i].speed;
         
-        if(josie.gemsCollected>totalCollectedGems)
-        {
+        if(josie.gemsCollected>totalCollectedGems){
            xblocks[i].speed+=1;
            yblocks[i].speed+=1;
         }
-   
     }
-    
-        fill(0, 255, 55);
-        textSize(18);
-        text("Score: " + score , 8, 24);
-        josie.draw(); //What is changed to change characters in game play!
-    
-    }
-    
-
+    fill(0, 255, 55);
+    textSize(18);
+    text("Score: " + score , 8, 24);
+    josie.draw(); 
 }; //game scene, called when currentScene = 2
 
 
 /*predefined functions below, mouse clicked is called when the mouse is clicked, draw is repeately calls scene functions*/
+
 mouseClicked = function(){
   if (currentScene === 0)
   {
       instructionButton.handleMouseClick();
-        
   }
   else if (currentScene === 1)
   {
       playButton.handleMouseClick();
-      
   }
-  /*
-  else if (currentScene === 2)
+  else if (currentScene === 3)
   {
       playAgainButton.handleMouseClick();
-      
-  }  //REMOVE IF PLAY AGIN IS NOT BEING USED!!!
+  } 
   
-  */
+
 };//mouse clicked calls button onClick functions
-draw = function() {/*A draw funciton that is testing if the current scene is 0 then it will display the splash scene. If it is 1, it will display instructionsScene, and if it's 2, it will show the Game scene. */
-    if (currentScene === 0 && stillPlaying === true)
-        {
-            splash();
-        }
-    else if (currentScene === 1 && stillPlaying === true)
+
+draw = function() {
+    if (currentScene === 0)
+    {
+        splash();
+    }
+    else if (currentScene === 1)
     {
         instructionsScene();
     }
-    else if (currentScene === 2 && stillPlaying === true)
+    else if (currentScene === 2)
     {
         game();
     }
-    else if (currentScene === 0 && stillPlaying === true)
+    else if (currentScene === 3)
     {
-        game();
+        gameEnd();
     }
-    /*Once all ships have passed across the yoo x -axis mark, the game is over. The user can then click "play again" to restart the game*/   
 }; //draws scenes if currentScene is at specified number
