@@ -1,16 +1,20 @@
+/*Code for a maze of blocks the user moves through with mouse movement. The user should avoid the blocks and collect gems to earn points. Main data structure uses arrays. 
+
+By: Josie Shirah and Julissa Tenas for URI CSC 106 Final Project on 5/11/2021*/
+
 //Global Variables
-var currentScene = 0;//Current scene at O is the Splash scene.
-var NUM_BLOCKS = 100;//Total number of ships.
+var currentScene = 0; //Splash scene = 0, instructions = 1, game play = 2
+var NUM_BLOCKS = 200; //Total number of blocks moving in each direction
 var BLOCK_SIZE = 20; //heighth and width of the blocks
 var NUM_GEMS = 15; //Total number of gems to be collected
-var score = 0;//Initial score of 0.
-var direction = 0; // 0 = blocks move from top ot bottom, 1 = blocks move from left to right
-var stillPlaying = true;//stillPlaying is global variable that is called  and implented in the code if the user is still playing
-var currentScene=0; //0 = splash; 1 = game play
-var xblocks = [];
-var yblocks = [];
+var score = 0; //inital score
+var stillPlaying = true; //playing game = true, false = gems all collected
+var xblocks = []; //array of blocks moving across x axis
+var yblocks = []; //array of blocks moving across y axis
+var gems = []; //array of gems that appear sequentially throughout game
 
-//bitmoji functions
+
+//bitmoji functions, parameters for x pos, y pos, and height
 var drawBitmojiBodyJosie=function(x,y,h){
    noStroke();
     fill(25, 82, 120);//shirt color
@@ -146,7 +150,10 @@ line(bitmojiX + (bitmojiHeight / 50) * 157, bitmojiY + (bitmojiHeight / 50) * 21
     stroke(0, 0, 0);
 };
 
-//Button Object 
+/*Objects and their functions are defined below*/
+
+/*Button object class, creates buttons for user interaction*/
+//constructor function for class button
 var Button = function(config) {
     this.x = config.x || 0;
     this.y = config.y || 0;
@@ -155,71 +162,131 @@ var Button = function(config) {
     this.label = config.label || "Click";
     this.onClick = config.onClick || function() {};
     //this.bitmojis = config.bitmojis || function(){};
-};
+}; 
 
+//draws rectangle for class Button below
 Button.prototype.draw = function() {
     fill(0, 234, 255);
     rect(this.x, this.y, this.width, this.height, 5);
     fill(0, 0, 0);
     textSize(19);
     textAlign(LEFT, TOP);
-    text(this.label, this.x+10, this.y+this.height/4);
+    text(this.label, this.x+7, this.y+this.height/4);
     //this.bitmojis
-}; //draw method for class Button
+}; 
+
+//prototype below checks if mouse is inside the button
 Button.prototype.isMouseInside = function() {
     return mouseX > this.x &&
            mouseX < (this.x + this.width) &&
            mouseY > this.y &&
            mouseY < (this.y + this.height);
-};//checks if mouse is inside the button
+};
+
+//prototype below checks if mouse is inside then runs onclick function 
 Button.prototype.handleMouseClick = function() {
     if (this.isMouseInside()) {
         this.onClick();
     }
-};//checks if mouse is inside then runs onclick function
+}; 
 
 
-var startButton = new Button({
-    x: 169,
-    y: 267,
-    width:108,
-    label: "Play game",
-    //bitmojis: drawBitmojiJosie(203,153,50),
-    onClick: function() {
-        currentScene=1;
-    }
-}); //start button
+/*Bitmoji object class, creates user icon*/
+/*constructor function for class Bitmoji below, parameters: x pos, y pos, height, and character (either josie or julissa*/
+var Bitmoji = function(x, y, height, character){
+    this.x = x;
+    this.y = y;
+    this.height = height;
+    this.bitmojiImg = character;
+    this.blocksHit = 0;
+    this.gemsCollected = 0;
+};
 
-mouseClicked = function() {
-    if(currentScene===0)
+//function below for class Bitmoji, calls the bitmoji functions at location of mouse
+Bitmoji.prototype.draw = function(){
+    this.x = mouseX;
+    this.y = mouseY;
+    this.bitmojiImg(this.x, this.y, this.height);
+};
+
+/*function below for class Bitmoji checks if object is over block and subtracts points, parameter: b is either block array of specified index*/
+Bitmoji.prototype.hitByBlock = function(b) {
+    if (b.x >= (this.x-20) && b.x <= (this.x + 20) && b.y >= (this.y-20) && b.y <= (this.y + 40))
     {
-        startButton.handleMouseClick();
+        this.blocksHit++; //REMOVE THIS??
+        score -=  5;
+        b.blockColor=color(0, 106, 255);
+            /*if (xblocks[1].x > 400)
+         {  
+            currentScene = 2;
+            fill(255, 255, 255);
+            textSize(60);
+            textFont(createFont("Berlin Sans FB"),60);
+            text("Game Over", 67,279);
+            playAgainButton.draw();
+         }//Move THIS CODE FOR PLAY AGAIN BUTON TO WORK*/ 
+    }    
+};
+
+    /*HIT BY BLOCK PROTOTYPE HAS CODE TO BE REMOVED FOR PLAY AGAIN BUTTON TO WORK*/
+    
+/*function below for class Bitmoji checks if object is over gem and adds points, parameter: g is the gem array of a specified index*/ 
+Bitmoji.prototype.collectGem = function(g) {
+    if ((g.x >= (this.x-50) && g.x <= (this.x + 50)) && (g.y >= (this.y-50) && g.y <= (this.y + 50)))
+    {
+        g.y = -400;
+        this.gemsCollected++;
+        score +=  30;
     }
-};//runs handleMouseClick for the various scenes 
-
-var splash = function(){
-    background(144, 232, 219);
-    fill(0, 0, 0);
-    textSize(24);
-    text("Josie and Julissa's Maze",80,210);
-    startButton.draw();
-    drawBitmojiJosie(154,153,60);
-    drawBitmojiJulissa(213,106,14);
-};//Splash goes on currentScene = 0 
-
-var gameEnd = function(){
-    fill(0, 255, 55);
-    textSize(40);
-    text("Game Over", 100,150);
-    textSize(30);
-    text("Score: " + score , 140, 200);
-    stillPlaying = false;
 };
 
 
-//put these back in to restart game
-var playButton = new Button(//a button instance called play button, when clicked, the Game Scene appears on screen.
-    { 
+/*Block object class, user must avoid objects of this class*/
+//constructor function for class Block below, parameters: x pos, y pos, side length
+var Block = function(x, y, blockLength) { 
+    this.x = x;
+    this.y = y;
+    this.height = blockLength;
+    this.width = blockLength;
+    this.speed = 1.5;
+    this.blockColor = color(255, 0, 0);
+};
+
+//function below describes how to draw the objects of class Block
+Block.prototype.draw = function() {
+    fill(this.blockColor);
+    rect(this.x, this.y, this.height, this.width);
+};
+
+
+/*Gem object class, user must collect objects of class Gem*/
+//constructor function for class Gem below, parameters: x pos, y pos
+var Gem = function(x,y){
+    this.x=x;
+    this.y=y;
+    this.img=getImage("cute/GemGreen");
+};
+
+//function below calls an image of the specified image at the objects location 
+Gem.prototype.draw= function() {
+    image(this.img, this.x, this.y, 40, 60);
+};
+
+
+/*New instances of the objects are defined below*/
+
+//new instances of class Button
+var instructionButton = new Button({
+    x: 169,
+    y: 267,
+    width:108,
+    label: "Instructions",
+    //bitmojis: drawBitmojiJosie(203,150,50),
+    onClick: function() {
+        currentScene=1;
+    }
+}); //on splash scene, sets currentScene=1
+var playButton = new Button({ 
         x: 211,
         y: 344,
         color: color(255, 10, 96),
@@ -229,10 +296,8 @@ var playButton = new Button(//a button instance called play button, when clicked
         {
         currentScene = 2;
         }
-    });
-    
-var playAgainButton = new Button(///a button instance called play again button, when clicked, splash Scene appears on screen.
-    { 
+    }); //on instruction scene, sets currentScene =2
+var playAgainButton = new Button({ 
         x: 211,
         y: 350,
         color: color(255, 10, 96),
@@ -246,118 +311,53 @@ var playAgainButton = new Button(///a button instance called play again button, 
         }
     });
     
-var instructionsScene = function() {//creates the instruction scene
+    /*NOTE: REMOVE PLAY AGAIN BUTTON IF IT IS NOT USED*/
+  
+//new instances of class Bitmoji, character used in game  
+var julissa = new Bitmoji(200, 317, 15, drawBitmojiJulissa);
+var josie = new Bitmoji(200, 200, 50, drawBitmojiJosie);
+
+//new instances of class Block, ojects to avoid in game, stored in an array
+for (var i = 0; i < NUM_BLOCKS; i++){
+    xblocks.push(new Block(11 + -i * 110 , random(10, 390), BLOCK_SIZE));
+    yblocks.push(new Block(random(10,390), 11 + -i*110, BLOCK_SIZE));
+}
+
+//new instances of class Gem, objects to collect in game, stored in an array
+for(var k = 0; k<NUM_GEMS; k++){
+    gems.push(new Gem(random(10,350),random(10,350)));
+}
+
+    
+/*Scene functions*/
+var splash = function(){
+    background(144, 232, 219);
+    fill(0, 0, 0);
+    textSize(24);
+    text("Josie and Julissa's Maze",80,210);
+    instructionButton.draw();
+    drawBitmojiJosie(154,153,60);
+    drawBitmojiJulissa(213,106,14);
+}; //splash scene, called when currentScene = 0 
+var instructionsScene = function() {
     background(246,231,222,255);
     textSize(25);
     strokeWeight(10);
     fill(62, 59, 227);
-    text("Blocks will move across the scree left to right and top to bottom. Use the mouse to have avatar avoid the red blocks - you lose 5 points each time you are hit. Collect the green gems to gain 30 points. Watch out the speed increases when gems are collected. Game ends when all gems are collected.", 10, 10,392,580); 
+    text("Blocks will move across the screen left to right and top to bottom. Use the mouse to move the avatar around avoiding the red blocks. You lose 5 points each time a block hits your avatar. Collect the green gems to gain 30 points. Watch out the speed increases when gems are collected. Game ends when all gems are collected.", 10, 10,392,580); 
     text("",94,10);
     strokeWeight(2);
     playButton.draw();
-};
-
-mouseClicked = function(){//This is a mouseClicked function allowing my buttons to be clickable and have its own function.
-  if (currentScene === 0)
-  {
-      startButton.handleMouseClick();
-        
-  }
-  else if (currentScene === 1)
-  {
-      playButton.handleMouseClick();
-      
-  }
-  else if (currentScene === 2)
-  {
-      playAgainButton.handleMouseClick();
-      
-  }
-};
-    
-var Bitmoji = function(x, y, height, character)//Object called bitmoji; creates my bitmoji
-    {
-        this.x = x;
-        this.y = y;
-        this.height = height;
-        this.bitmojiImg = character;
-        this.blocksHit = 0;
-        this.gemsCollected = 0;
-    };
-
-Bitmoji.prototype.draw = function() {//draw method:draws itself// scoring occurs is this.y > 350 && this.y <50 ex: var direction=0 for y is 350 and direction =1 this.y is 50 (get from bottom to top = 10 points)
-    this.x = mouseX;
-    this.y = mouseY;
-    this.bitmojiImg(this.x, this.y, this.height);
-};
-
-
-Bitmoji.prototype.hitByBlock = function(b) {
-    if ((b.x >= this.x && b.x <= (this.x + 40)) &&
-        (b.y >= this.y && b.y <= (this.y + 40)))
-        {
-        /*if (xblocks[1].x > 400)
-         {  
-            currentScene = 2;
-            fill(255, 255, 255);
-            textSize(60);
-            textFont(createFont("Berlin Sans FB"),60);
-            text("Game Over", 67,279);
-            playAgainButton.draw();
-         }*/ //move this Code!
-            this.blocksHit++;
-            score -=  5;
-            
-        }    
-};
-Bitmoji.prototype.collectGem = function(b) {
-    if ((b.x >= (this.x-50) && b.x <= (this.x + 50)) &&
-        (b.y >= (this.y-50) && b.y <= (this.y + 50)))
-        {
-        b.y = -400;
-        this.gemsCollected++;
-        score +=  30;
-        }
-};
-
-var Block = function(x, y, blockHeight, blockWidth) { //change structure to be object oriented - config, pass in object. 
-    this.x = x;
-    this.y = y;
-    this.height = blockHeight;
-    this.width = blockWidth;
-    this.speed = 1.5;
-};
-Block.prototype.draw = function() {
-    fill(255, 0, 0);
-    rect(this.x, this.y, this.height, this.width);
-};
-
-var julissa = new Bitmoji(200, 317, 15, drawBitmojiJulissa);//bitmoji displayed on the screen
-var josie = new Bitmoji(200, 200, 50, drawBitmojiJosie);
-
-
-for (var i = 0; i < NUM_BLOCKS; i++)
-{
-    xblocks.push(new Block(11 + -i * 110 , random(20, 260), BLOCK_SIZE, BLOCK_SIZE));
-    yblocks.push(new Block(random(20,380), 11 + -i*110, BLOCK_SIZE, BLOCK_SIZE));
-}//placement blocks
-
-//code for gems
-var Gem = function(x,y){
-    this.x=x;
-    this.y=y;
-    this.img=getImage("cute/GemGreen");
-};
-Gem.prototype.draw= function() {
-    image(this.img, this.x, this.y, 40, 60);
-};
-var gems = [];
-for(var k = 0; k<NUM_GEMS; k++)
-{
-    gems.push(new Gem(random(10,350),random(10,350)));
-}
-
-var game = function() {//User Interaction of Program
+}; //instruction scene, current scene = 1
+var gameEnd = function(){
+    fill(0, 255, 55);
+    textSize(40);
+    text("Game Over", 100,150);
+    textSize(30);
+    text("Score: " + score , 140, 200);
+    stillPlaying = false;
+}; //game end scene, called when gems are collected
+var game = function() {
      currentScene = 2;
      background(0, 0, 0);
      fill(255, 255, 255);
@@ -373,7 +373,7 @@ var game = function() {//User Interaction of Program
     }
     if(stillPlaying)
     {
-        for (var i = 0; i < xblocks.length; i++) { //For loop that draws ships, when the loop reaches an index of 49 the ships will double there speeds across the screens.
+        for (var i = 0; i < NUM_BLOCKS; i++) { //For loop that draws ships, when the loop reaches an index of 49 the ships will double there speeds across the screens.
         xblocks[i].draw();
         yblocks[i].draw();
         josie.hitByBlock(xblocks[i]);//This must also be changed when character is changed
@@ -397,7 +397,30 @@ var game = function() {//User Interaction of Program
     }
     
 
-};
+}; //game scene, called when currentScene = 2
+
+
+/*predefined functions below, mouse clicked is called when the mouse is clicked, draw is repeately calls scene functions*/
+mouseClicked = function(){
+  if (currentScene === 0)
+  {
+      instructionButton.handleMouseClick();
+        
+  }
+  else if (currentScene === 1)
+  {
+      playButton.handleMouseClick();
+      
+  }
+  /*
+  else if (currentScene === 2)
+  {
+      playAgainButton.handleMouseClick();
+      
+  }  //REMOVE IF PLAY AGIN IS NOT BEING USED!!!
+  
+  */
+};//mouse clicked calls button onClick functions
 draw = function() {/*A draw funciton that is testing if the current scene is 0 then it will display the splash scene. If it is 1, it will display instructionsScene, and if it's 2, it will show the Game scene. */
     if (currentScene === 0 && stillPlaying === true)
         {
@@ -416,4 +439,4 @@ draw = function() {/*A draw funciton that is testing if the current scene is 0 t
         game();
     }
     /*Once all ships have passed across the yoo x -axis mark, the game is over. The user can then click "play again" to restart the game*/   
-};
+}; //draws scenes if currentScene is at specified number
