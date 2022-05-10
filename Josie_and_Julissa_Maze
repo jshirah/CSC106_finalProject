@@ -3,15 +3,15 @@
 By: Josie Shirah and Julissa Tenas for URI CSC 106 Final Project on 5/11/2021*/
 
 //Global Variables
-var currentScene = 0; //Splash scene = 0, instructions = 1, game play = 2
-var NUM_BLOCKS = 200; //Total number of blocks moving in each direction
-var BLOCK_SIZE = 20; //height and width of the blocks
-var NUM_GEMS = 15; //Total number of gems to be collected
-var score = 0; //inital score
+var currentScene = 0;    //Splash scene=0, instructions=1, game play=2, gameEnd=3
+var NUM_BLOCKS = 200;    //Total number of blocks moving in each direction
+var BLOCK_SIZE = 20;     //height and width of the blocks
+var NUM_GEMS = 15;       //Total number of gems to be collected
+var score = 0;           //inital score
 var stillPlaying = true; //playing game = true, false = gems all collected
-var xblocks = []; //array of blocks moving across x axis
-var yblocks = []; //array of blocks moving across y axis
-var gems = []; //array of gems that appear sequentially throughout game
+var xblocks = [];        //array of blocks moving across x axis
+var yblocks = [];        //array of blocks moving across y axis
+var gems = [];           //array of gems that appear throughout game
 
 
 //bitmoji functions, parameters for x pos, y pos, and height
@@ -179,7 +179,7 @@ Button.prototype.draw = function() {
     //this.bitmojis
 }; 
 
-//prototype below checks if mouse is inside the button
+//method below checks if mouse is inside the button
 Button.prototype.isMouseInside = function() {
     return mouseX > this.x &&
            mouseX < (this.x + this.width) &&
@@ -187,7 +187,7 @@ Button.prototype.isMouseInside = function() {
            mouseY < (this.y + this.height);
 };
 
-//prototype below checks if mouse is inside then runs onclick function 
+//method below checks if mouse is inside then runs onclick function 
 Button.prototype.handleMouseClick = function() {
     if (this.isMouseInside()) {
         this.onClick();
@@ -206,24 +206,24 @@ var Bitmoji = function(x, y, height, character){
     this.gemsCollected = 0;
 };
 
-//function below for class Bitmoji, calls the bitmoji functions at location of mouse
+//method below for class Bitmoji, calls the bitmoji functions at location of mouse
 Bitmoji.prototype.draw = function(){
     this.x = mouseX;
     this.y = mouseY;
     this.bitmojiImg(this.x, this.y, this.height);
 };
 
-/*function below for class Bitmoji checks if object is over block and subtracts points, parameter: b is either block array of specified index*/
+/*method below for class Bitmoji checks if object is over block and subtracts points, parameter: b is either block array of specified index*/
 Bitmoji.prototype.hitByBlock = function(b) {
     if (b.x >= (this.x-25) && b.x <= (this.x + 25) && b.y >= (this.y-30) && b.y <= (this.y + 30) && b.blockColor=== color(14, 245, 237))
     {
         this.blocksHit++; 
         score -=  5;
-        b.blockColor=color(255, 255, 255);
+        b.blockColor=color(8, 28, 209);
     }    
 };
 
-/*function below for class Bitmoji checks if object is over gem and adds points, parameter: g is the gem array of a specified index*/ 
+/*method below for class Bitmoji checks if object is over gem and adds points, parameter: g is the gem array of a specified index*/ 
 Bitmoji.prototype.collectGem = function(g) {
     if ((g.x >= (this.x-40) && g.x <= (this.x + 40)) && (g.y >= (this.y-40) && g.y <= (this.y + 40)))
     {
@@ -245,7 +245,7 @@ var Block = function(x, y, blockLength) {
     this.blockColor = color(14, 245, 237);
 };
 
-//function below describes how to draw the objects of class Block
+//method below describes how to draw the objects of class Block
 Block.prototype.draw = function() {
     fill(this.blockColor);
     rect(this.x, this.y, this.height, this.width);
@@ -260,12 +260,16 @@ var Gem = function(x,y,height){
     this.height=height;
 };
 
-//function below calls an image of the specified image at the objects location 
+//method below calls an image of the specified image at the objects location 
 Gem.prototype.draw= function() {
     drawBitmojiJulissa(this.x, this.y, this.height);
 };
 
     /*New instances of the objects are defined below*/
+
+//new instances of class Bitmoji, character used in game  
+var julissa = new Bitmoji(200, 317, 15, drawBitmojiJulissa);
+var josie = new Bitmoji(200, 200, 50, drawBitmojiJosie);
 
 /*gameSetUp function resets key features and creates new instances of the objects block and gem - called in the playButton.onclick*/
 var gameSetUp = function(){
@@ -275,6 +279,7 @@ var gameSetUp = function(){
     gems = [];
     score = 0;
     stillPlaying = true;
+    josie.blocksHit = 0;
     
     //new instances of class Block, ojects to avoid in game, stored in an array
     for (var i = 0; i < NUM_BLOCKS; i++){
@@ -288,10 +293,7 @@ var gameSetUp = function(){
     }
 };
 
-//new instances of class Bitmoji, character used in game  
-var julissa = new Bitmoji(200, 317, 15, drawBitmojiJulissa);
-var josie = new Bitmoji(200, 200, 50, drawBitmojiJosie);
-
+    /*New instances of the objects are defined below*/
 //new instances of class Button
 var instructionButton = new Button({
     x: 149,
@@ -338,11 +340,10 @@ var splash = function(){
 }; //splash scene, called when currentScene = 0 
 var instructionsScene = function() {
     background(168, 236, 240);
-    textSize(25);
+    textSize(23);
     strokeWeight(10);
     fill(34, 87, 83);
-    text("Blocks will move across the screen left to right and top to bottom. Use the mouse to move the avatar around avoiding the red blocks. You lose 5 points each time a block hits your avatar. Tag Julissa's bitmoji to gain 15 points. Watch out the speed increases when Julissa is tagged. Game ends when Julissa is tagged 15 times.", 10, 10,392,580); 
-    text("",94,10);
+    text("Blocks will move across the screen left to right and top to bottom. Use the mouse to move the avatar around avoiding the blue blocks. When a block hits your avatar it turns white and you lose 5 points. Tag Julissa's bitmoji by moving your mouse over the bitmoji to gain 15 points. Watch out the speed increases when Julissa is tagged. Game ends when Julissa is tagged 15 times or when all the blocks run out!", 10, 10,392,580); 
     strokeWeight(2);
     playButton.draw();
 }; //instruction scene, current scene = 1
@@ -357,19 +358,33 @@ var gameEnd = function(){
     playAgainButton.draw();
 }; //game end scene, called when gems are collected
 var game = function() {
-    currentScene = 2;
     background(0, 0, 0);
-    fill(255, 255, 255);
-    var totalCollectedGems = josie.gemsCollected;
     
+    //temp variable to check if a gem has been collected
+    var totalCollectedGems = josie.gemsCollected; 
+    
+    //checks if number of gems collected is a proper index 
     if(gems.length-1>=josie.gemsCollected){
-        gems[josie.gemsCollected].draw();
-        josie.collectGem(gems[josie.gemsCollected]);
-    }
+        //draws gem at the index of gemsCollected
+        gems[josie.gemsCollected].draw(); 
+        
+        //runs the collectGem method for the gems array at index gemsCollected
+        josie.collectGem(gems[josie.gemsCollected]); 
+    } 
+    
+    //changes the scene to Game over by indexing currentScene
     else{
         currentScene = 3;
         stillPlaying = false;
+    } 
+    
+    /*Checks when the last block (at the last index of array) passes the right side of screen*/
+    if(xblocks[xblocks.length-1].x>400){
+        currentScene = 3;
+        stillPlaying = false;
     }
+    
+    /*iterates through the number of blocks calls draw method for each block in the arrays, checks whether the blocks have been hit at each index, changes block position, increases speed for all blocks if the temp variable totalCollectedGems is less than the number of gemsCollected (meaning that a gem has been collected this time through the draw function*/
     for (var i = 0; i < NUM_BLOCKS; i++) {
         xblocks[i].draw();
         yblocks[i].draw();
@@ -383,12 +398,15 @@ var game = function() {
            yblocks[i].speed+=0.3;
         }
     }
+    
+    //draws the text of score and number of times Julissa has been tagged
     fill(247, 193, 240);
     textSize(18);
     text("Score: " + score , 8, 24);
-    josie.draw(); 
+    text("Number of tags: " + josie.gemsCollected , 8, 0);
+    
+    josie.draw(); //draws user
 }; //game scene, called when currentScene = 2
-
 
 /*predefined functions below, mouse clicked is called when the mouse is clicked, draw is repeately calls scene functions*/
 
@@ -407,8 +425,7 @@ mouseClicked = function(){
   } 
   
 
-};//mouse clicked calls button onClick functions
-
+};//mouse clicked calls button onClick functions for the scene the button is on
 
 draw = function() {
     if (currentScene === 0)
@@ -427,4 +444,4 @@ draw = function() {
     {
         gameEnd();
     }
-}; //draws scenes if currentScene is at specified number
+}; //draws scenes if currentScene is at the proper number
