@@ -1,11 +1,11 @@
-/*Code for a maze of blocks the user moves through with mouse movement. The user should avoid the blocks and collect gems to earn points. Main data structure uses arrays. 
+/*Code for a maze of blocks the user moves through with mouse movement. The user should avoid the blocks and tag Julissa to earn points. Main data structure uses arrays. In the code, the bitmoji being tagged is called a gem so as to avoid confusion with the bitmoji object class.
 
 By: Josie Shirah and Julissa Tenas for URI CSC 106 Final Project on 5/11/2021*/
 
 //Global Variables
 var currentScene = 0; //Splash scene = 0, instructions = 1, game play = 2
 var NUM_BLOCKS = 200; //Total number of blocks moving in each direction
-var BLOCK_SIZE = 20; //heighth and width of the blocks
+var BLOCK_SIZE = 20; //height and width of the blocks
 var NUM_GEMS = 15; //Total number of gems to be collected
 var score = 0; //inital score
 var stillPlaying = true; //playing game = true, false = gems all collected
@@ -70,6 +70,8 @@ var drawBitmojiJosie=function(x,y,h){
     stroke(0,0,0);
 };
 var drawBitmojiJulissa = function(bitmojiX,bitmojiY,bitmojiHeight){
+    bitmojiX-=53;
+    bitmojiY-=50;
     stroke(0, 0, 0);
     strokeWeight(1);
     fill(23, 15, 15);//black
@@ -160,8 +162,9 @@ var Button = function(config) {
     this.width = config.width || 150;
     this.height = config.height || 50;
     this.label = config.label || "Click";
+    this.textPos = config.textPos || 7;
     this.onClick = config.onClick || function() {};
-    this.buttonColor = config.buttonColor ||color(0, 255, 55);
+    this.buttonColor = config.buttonColor ||color(14, 245, 237);
     //this.bitmojis = config.bitmojis || function(){};
 }; 
 
@@ -172,7 +175,7 @@ Button.prototype.draw = function() {
     fill(0, 0, 0);
     textSize(19);
     textAlign(LEFT, TOP);
-    text(this.label, this.x+7, this.y+this.height/4);
+    text(this.label, this.x+ this.textPos, this.y+this.height/4);
     //this.bitmojis
 }; 
 
@@ -212,21 +215,21 @@ Bitmoji.prototype.draw = function(){
 
 /*function below for class Bitmoji checks if object is over block and subtracts points, parameter: b is either block array of specified index*/
 Bitmoji.prototype.hitByBlock = function(b) {
-    if (b.x >= (this.x-20) && b.x <= (this.x + 20) && b.y >= (this.y-20) && b.y <= (this.y + 40) && b.blockColor=== color(255,0,0))
+    if (b.x >= (this.x-25) && b.x <= (this.x + 25) && b.y >= (this.y-30) && b.y <= (this.y + 30) && b.blockColor=== color(14, 245, 237))
     {
-        this.blocksHit++; //REMOVE THIS??
+        this.blocksHit++; 
         score -=  5;
-        b.blockColor=color(0, 106, 255);
+        b.blockColor=color(255, 255, 255);
     }    
 };
 
 /*function below for class Bitmoji checks if object is over gem and adds points, parameter: g is the gem array of a specified index*/ 
 Bitmoji.prototype.collectGem = function(g) {
-    if ((g.x >= (this.x-50) && g.x <= (this.x + 50)) && (g.y >= (this.y-50) && g.y <= (this.y + 50)))
+    if ((g.x >= (this.x-40) && g.x <= (this.x + 40)) && (g.y >= (this.y-40) && g.y <= (this.y + 40)))
     {
         g.y = -400;
         this.gemsCollected++;
-        score +=  30;
+        score +=  15;
     }
 };
 
@@ -239,7 +242,7 @@ var Block = function(x, y, blockLength) {
     this.height = blockLength;
     this.width = blockLength;
     this.speed = 1.5;
-    this.blockColor = color(255, 0, 0);
+    this.blockColor = color(14, 245, 237);
 };
 
 //function below describes how to draw the objects of class Block
@@ -251,15 +254,15 @@ Block.prototype.draw = function() {
 
     /*Gem object class, user must collect objects of class Gem*/
 //constructor function for class Gem below, parameters: x pos, y pos
-var Gem = function(x,y){
+var Gem = function(x,y,height){
     this.x=x;
     this.y=y;
-    this.img=getImage("cute/GemGreen");
+    this.height=height;
 };
 
 //function below calls an image of the specified image at the objects location 
 Gem.prototype.draw= function() {
-    image(this.img, this.x, this.y, 40, 60);
+    drawBitmojiJulissa(this.x, this.y, this.height);
 };
 
     /*New instances of the objects are defined below*/
@@ -280,7 +283,7 @@ var gameSetUp = function(){
     }
     //new instances of class Gem, objects to collect in game, stored in an array
     for(var k = 0; k<NUM_GEMS; k++){
-        gems.push(new Gem(random(10,350),random(10,350)));
+        gems.push(new Gem(random(20,380),random(30,380),10));
         
     }
 };
@@ -303,9 +306,8 @@ var instructionButton = new Button({
 var playButton = new Button({ 
         x: 211,
         y: 344,
-        buttonColor: color(255, 10, 96),
         label: "Play!",
-        textPos: 55,
+        textPos: 51,
         onClick: function(){
             currentScene = 2;
             gameSetUp();
@@ -314,8 +316,8 @@ var playButton = new Button({
     /*play button is on instruction scene, sets currentScene = 2, onclick calls gameSetUp to initialize arrays*/
 var playAgainButton = new Button({ 
     x: 121,
-    y: 239,
-    textPos: 35,
+    y: 281,
+    textPos: 30,
     label: "Play Again!",
     onClick: function(){
         currentScene = 0;
@@ -326,33 +328,33 @@ var playAgainButton = new Button({
 
 /*Scene functions*/
 var splash = function(){
-    background(144, 232, 219);
+    background(168, 236, 240);
     fill(0, 0, 0);
     textSize(24);
-    text("Josie and Julissa's Maze",80,210);
+    text("Josie and Julissa's Extreme Tag",38,210);
     instructionButton.draw();
     drawBitmojiJosie(154,153,60);
-    drawBitmojiJulissa(213,106,14);
+    drawBitmojiJulissa(242,153,14);
 }; //splash scene, called when currentScene = 0 
 var instructionsScene = function() {
-    background(246,231,222,255);
+    background(168, 236, 240);
     textSize(25);
     strokeWeight(10);
-    fill(62, 59, 227);
-    text("Blocks will move across the screen left to right and top to bottom. Use the mouse to move the avatar around avoiding the red blocks. You lose 5 points each time a block hits your avatar. Collect the green gems to gain 30 points. Watch out the speed increases when gems are collected. Game ends when all gems are collected.", 10, 10,392,580); 
+    fill(34, 87, 83);
+    text("Blocks will move across the screen left to right and top to bottom. Use the mouse to move the avatar around avoiding the red blocks. You lose 5 points each time a block hits your avatar. Tag Julissa's bitmoji to gain 15 points. Watch out the speed increases when Julissa is tagged. Game ends when Julissa is tagged 15 times.", 10, 10,392,580); 
     text("",94,10);
     strokeWeight(2);
     playButton.draw();
 }; //instruction scene, current scene = 1
 var gameEnd = function(){
     background(0, 0, 0);
-    fill(0, 255, 55);
+    fill(14, 245, 237);
     textSize(40);
     text("Game Over", 100,150);
     textSize(30);
-    text("Score: " + score , 140, 200);
+    text("Score: " + score , 139, 200);
+    text("Blocks Hit: " + josie.blocksHit, 123, 242);
     playAgainButton.draw();
-    
 }; //game end scene, called when gems are collected
 var game = function() {
     currentScene = 2;
@@ -377,11 +379,11 @@ var game = function() {
         yblocks[i].y += yblocks[i].speed;
         
         if(josie.gemsCollected>totalCollectedGems){
-           xblocks[i].speed+=1;
-           yblocks[i].speed+=1;
+           xblocks[i].speed+=0.3;
+           yblocks[i].speed+=0.3;
         }
     }
-    fill(0, 255, 55);
+    fill(247, 193, 240);
     textSize(18);
     text("Score: " + score , 8, 24);
     josie.draw(); 
@@ -406,6 +408,7 @@ mouseClicked = function(){
   
 
 };//mouse clicked calls button onClick functions
+
 
 draw = function() {
     if (currentScene === 0)
